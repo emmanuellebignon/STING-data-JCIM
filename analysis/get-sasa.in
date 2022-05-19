@@ -1,0 +1,6 @@
+parm STING_cGAMP_Q_dry.prmtop
+trajin STING_cGAMP_Q_eq_run1-2_dry.dcd 
+
+molsurf C9 :9 out sasa_cGAMPQ.dat radii vdw
+molsurf C206 :206 out sasa_cGAMPQ.dat radii vdw
+

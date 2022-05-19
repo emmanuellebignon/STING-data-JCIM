@@ -1,0 +1,4 @@
+parm ../STING_apo_WT_dry.prmtop
+trajin ../STING_apo_WT_eq_run1-3_dry.dcd
+
+cluster hieragglo averagelinkage rms :1-398 out cnumvtime.dat summaryhalf summary.dat cpopvtime pop.dat normframe repout rep repfmt pdb
