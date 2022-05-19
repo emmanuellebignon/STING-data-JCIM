@@ -1,0 +1,149 @@
+#Parameters for Amber files/force field in NAMD
+
+amber on
+switching 	off
+exclude 	scaled1-4
+1-4scaling 	0.833333333
+scnb 		2.0
+readexclusions 	yes
+cutoff 		9
+pairListDist 	11
+LJcorrection 	on
+ZeroMomentum 	on
+
+
+#Input/Output file names
+
+set pdb_file STING_apo_A_box 
+set fix_file STING_apo_A_box
+set prmtop_file STING_apo_A_box_hmr
+
+set outputname   STING_apo_A_eq
+restartname      STING_apo_A_eq_0
+
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+## NAMD RUN AJUSTABLES PARAMETERS %
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## grid size
+## VDM report the size of the box (x y z) is : 123.49400329589844 123.60900115966797 123.00500106811523
+#116.2206820 116.1830310 115.9593650
+set box_x 113.0
+set box_y 113.0
+set box_z 113.0
+
+## temperature
+set temperature    300
+
+## minimisation steps
+set minim 10000
+## duration of the simulation in fs !
+## note 1 fs = 10^-6 ns | exemple 1000000 equal to 1 ns
+set duration 50000000
+
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+parmfile $prmtop_file.prmtop
+coordinates $pdb_file.pdb
+
+binaryrestart no
+outputTiming 2500
+
+temperature $temperature
+
+# Integrator Parameters
+# timestep : defult 2.0 | after HMR : 4.0
+timestep            4.0
+nonbondedFreq       1
+fullElectFrequency  1
+stepspercycle       20
+
+rigidBonds          	all
+rigidtolerance      	1.0e-8
+rigiditerations     	100
+usesettle 		on
+
+# Constant Temperature Control
+
+ langevin             on
+ langevintemp         300.0
+ langevindamping      1.0
+
+
+ # CONSTANT-P
+
+ langevinpiston       on
+ langevinpistontarget 1
+ langevinpistonperiod 100
+ langevinpistondecay   50
+ langevinpistontemp   300
+
+ StrainRate           0.0 0.0 0.0
+
+
+ # PME
+
+ PME                  yes
+ PMETolerance         10e-6
+ PMEInterpOrder       4
+ PMEGridSpacing       1
+
+
+
+# Periodic Boundary Conditions
+
+cellBasisVector1     $box_x   0.0   0.0
+cellBasisVector2     0.0   $box_y   0.0
+cellBasisVector3     0.0   0.0   $box_z
+
+wrapWater           on
+wrapAll             on
+
+#PME                 on
+#PMEGridSpacing      1.0
+#PMETolerance        10e-6
+#PMEInterpOrder      4
+
+useGroupPressure      yes  # needed for rigidBonds
+useFlexibleCell       no   # membrane simulation
+useConstantArea       no
+useConstantRatio      no
+
+# Output
+outputName          $outputname
+# par defaut : 100 | si on utilise HMR : 10000
+restartfreq         10000
+dcdfreq             10000
+xstFreq             10000
+outputEnergies      10000
+outputPressure      10000
+
+DCDunitcell         yes
+
+
+constraints on
+
+consexp 2
+consref $pdb_file.pdb
+conskfile $fix_file.fix
+conskcol B
+
+## atom fixation
+
+#colvars on
+#colvarsConfig fix_orientation.in
+
+
+##%%%%%%%%%%%%%%%%%%%
+## EXECUTION SCRIPT %
+##%%%%%%%%%%%%%%%%%%%
+constraintScaling 1
+minimize $minim
+run 3000000
+constraintScaling 0.5
+run 3000000
+constraintScaling 0.1
+run 3000000
+constraintScaling 0
+run $duration
