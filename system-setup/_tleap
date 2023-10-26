@@ -1,0 +1,34 @@
+## Amber force field
+source leaprc.protein.ff14SB
+#loadoff CMP.lib
+#loadamberparams CMP.frcmod
+
+## ions paremeters
+loadamberparams frcmod.ionsjc_tip3p
+
+## protein coordinates
+pro = loadpdb "STING_apo_A.pdb"
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## iso at the end of the line specify : box is a square
+## if you delete iso you can create a parallelepipede box
+solvatebox pro TIP3PBOX 15.0 iso
+
+## neutralise the charge of your system
+## if your system is charged (+) : use Cl- 
+## but if your system is charged (-) : use K+
+#check pro charge
+addions pro K+ 0.
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+## pdb du systeme entier
+savepdb pro STING_apo_230A_box.pdb
+
+## topologie et coordonnees de depart
+saveamberparm pro STING_apo_230A_box.prmtop STING_apo_230A_box.inpcrd
+quit
+
+
